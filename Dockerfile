@@ -1,6 +1,6 @@
 # Use a base image with the desired programming language and runtime
 FROM python:3.9-slim
-#Added comment
+#Added comments
 # Set the working directory inside the container
 WORKDIR /app
 
