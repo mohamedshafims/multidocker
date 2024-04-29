@@ -39,3 +39,7 @@ jobs:
               docker push "${{ secrets.DOCKER_USERNAME }}/${{ github.repository }}/${service}:${{ github.sha }}"
             fi
           done
+
+      - name: Verify pushed images
+        run: |
+          docker images "${{ secrets.DOCKER_USERNAME }}/${{ github.repository }}"
