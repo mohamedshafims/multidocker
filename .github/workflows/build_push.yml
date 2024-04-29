@@ -6,7 +6,6 @@ on:
       - main
 
 env:
-  DOCKER_REGISTRY: docker.io
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
@@ -20,7 +19,7 @@ jobs:
 
       - name: Configure Docker CLI
         run: |
-          echo "${{ env.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin "${{ env.DOCKER_REGISTRY }}"
+          echo "${{ env.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin
 
       - name: Determine modified services
         id: changes
@@ -34,9 +33,9 @@ jobs:
           services=(${{ steps.changes.outputs.services }})
           for service in "${services[@]}"; do
             if [[ -f "${service}/Dockerfile" ]]; then
-              docker build -t "${{ env.DOCKER_REGISTRY }}/${{ github.repository_owner }}/${{ github.repository }}/${service}:${{ github.sha }}" -f "${service}/Dockerfile" .
-              docker push "${{ env.DOCKER_REGISTRY }}/${{ github.repository_owner }}/${{ github.repository }}/${service}:${{ github.sha }}"
+              docker build -t "${{ secrets.DOCKER_USERNAME }}/${{ github.repository }}/${service}:${{ github.sha }}" -f "${service}/Dockerfile" .
+              docker push "${{ secrets.DOCKER_USERNAME }}/${{ github.repository }}/${service}:${{ github.sha }}"
             else
-              docker push "${{ env.DOCKER_REGISTRY }}/${{ github.repository_owner }}/${{ github.repository }}/${service}:${{ github.sha }}"
+              docker push "${{ secrets.DOCKER_USERNAME }}/${{ github.repository }}/${service}:${{ github.sha }}"
             fi
           done
