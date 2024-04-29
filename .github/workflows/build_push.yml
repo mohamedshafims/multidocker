@@ -20,17 +20,7 @@ jobs:
       - name: Login to Docker Hub
         run: docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PASSWORD }}
 
-      - name: Build and push app service
+      - name: Build and push services
         run: |
-          docker-compose build app
-          docker-compose push app
-
-      - name: Build and push db service
-        run: |
-          docker-compose build db
-          docker-compose push db
-
-      - name: Build and push hasura service
-        run: |
-          docker-compose build hasura
-          docker-compose push hasura
+          docker-compose build --parallel
+          docker-compose push
