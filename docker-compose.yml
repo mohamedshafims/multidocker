@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+      - hasura
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: hello_db
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+  hasura:
+    image: hasura/graphql-engine:v2.4.1
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:example@db:5432/hello_db
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_ADMIN_SECRET: myadminsecret
+      HASURA_GRAPHQL_ENABLE_TELEMETRY: "false"
