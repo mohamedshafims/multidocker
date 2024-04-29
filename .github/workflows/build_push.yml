@@ -1,0 +1,51 @@
+name: Docker Build and Push
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DOCKER_REGISTRY: docker.io
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Configure Docker CLI
+        run: |
+          echo "${{ env.DOCKER_PASSWORD }}" | docker login -u "${{ env.DOCKER_USERNAME }}" --password-stdin "${{ env.DOCKER_REGISTRY }}"
+
+      - name: Read services from configuration
+        id: services
+        run: |
+          services=()
+          while IFS= read -r service; do
+            services+=("$service")
+          done < services.txt
+          echo "::set-output name=services::${services[*]}"
+
+      - name: Determine changed services
+        id: changes
+        run: |
+          changed_services=()
+          for service in ${{ steps.services.outputs.services }}; do
+            if git diff --name-only HEAD^ "${service}/" | grep -q "${service}/"; then
+              changed_services+=("${service}")
+            fi
+          done
+          echo "::set-output name=services::${changed_services[*]}"
+
+      - name: Build and push Docker images
+        run: |
+          services=(${{ steps.changes.outputs.services }})
+          for service in "${services[@]}"; do
+            docker build -t "${{ env.DOCKER_REGISTRY }}/${{ github.repository_owner }}/${{ github.repository }}/${service}:${{ github.sha }}" -f "${service}/Dockerfile" .
+            docker push "${{ env.DOCKER_REGISTRY }}/${{ github.repository_owner }}/${{ github.repository }}/${service}:${{ github.sha }}"
+          done
