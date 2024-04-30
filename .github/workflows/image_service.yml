@@ -24,7 +24,7 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-          tags: your-registry/postgres:latest
+          tags: shafibhaii/db-service:latest
           build-args: |
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=example
@@ -37,7 +37,7 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-          tags: your-registry/hasura:latest
+          tags: shafibhaii/hasura-service:latest
           build-args: |
             HASURA_GRAPHQL_DATABASE_URL=postgres://postgres:example@db:5432/hello_db
             HASURA_GRAPHQL_ENABLE_CONSOLE=true
