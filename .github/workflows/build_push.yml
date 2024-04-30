@@ -31,7 +31,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: your-username/app-service:${{ steps.version.outputs.tag }}
+          tags: app-service:${{ steps.version.outputs.tag }}
 
       - name: Build and push db service image
         uses: docker/build-push-action@v2
@@ -39,7 +39,7 @@ jobs:
           context: .
           file: ./docker-compose.yml
           push: true
-          tags: your-username/db-service:${{ steps.version.outputs.tag }}
+          tags: db-service:${{ steps.version.outputs.tag }}
           target: db
 
       - name: Build and push hasura service image
@@ -48,5 +48,5 @@ jobs:
           context: .
           file: ./docker-compose.yml
           push: true
-          tags: your-username/hasura-service:${{ steps.version.outputs.tag }}
+          tags: hasura-service:${{ steps.version.outputs.tag }}
           target: hasura
