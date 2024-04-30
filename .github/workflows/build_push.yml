@@ -33,11 +33,21 @@ jobs:
           tags: shafibhaii/app-service:${{ steps.version.outputs.tag }}
 
       - name: Build and push db service image
-        run: |
-          docker build -t shafibhaii/db-service:${{ steps.version.outputs.tag }} --file docker-compose.yml .
-          docker push shafibhaii/db-service:${{ steps.version.outputs.tag }}
+        run: docker-compose -f docker-compose.yml build db
+        env:
+          DOCKER_BUILDKIT: 1
+
+      - name: Push db service image
+        run: docker-compose -f docker-compose.yml push db
+        env:
+          DOCKER_BUILDKIT: 1
 
       - name: Build and push hasura service image
-        run: |
-          docker build -t shafibhaii/hasura-service:${{ steps.version.outputs.tag }} --file docker-compose.yml .
-          docker push shafibhaii/hasura-service:${{ steps.version.outputs.tag }}
+        run: docker-compose -f docker-compose.yml build hasura
+        env:
+          DOCKER_BUILDKIT: 1
+
+      - name: Push hasura service image
+        run: docker-compose -f docker-compose.yml push hasura
+        env:
+          DOCKER_BUILDKIT: 1
