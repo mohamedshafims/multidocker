@@ -22,6 +22,6 @@
     context: .
     file: ./docker-compose.yml
     push: true
-    tags: shaibhaii/hasura-service:${{ steps.version.outputs.tag }}
+    tags: shafibhaii/hasura-service:${{ steps.version.outputs.tag }}
     target: hasura
 ...
