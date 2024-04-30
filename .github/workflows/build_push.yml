@@ -38,9 +38,9 @@ jobs:
           DOCKER_BUILDKIT: 1
 
       - name: Push db service image
-        run: docker-compose -f docker-compose.yml push db
-        env:
-          DOCKER_BUILDKIT: 1
+        run: |
+          docker tag db-service:${{ steps.version.outputs.tag }} shafibhaii/db-service:${{ steps.version.outputs.tag }}
+          docker push shafibhaii/db-service:${{ steps.version.outputs.tag }}
 
       - name: Build and push hasura service image
         run: docker-compose -f docker-compose.yml build hasura
@@ -48,6 +48,6 @@ jobs:
           DOCKER_BUILDKIT: 1
 
       - name: Push hasura service image
-        run: docker-compose -f docker-compose.yml push hasura
-        env:
-          DOCKER_BUILDKIT: 1
+        run: |
+          docker tag hasura-service:${{ steps.version.outputs.tag }} shafibhaii/hasura-service:${{ steps.version.outputs.tag }}
+          docker push shafibhaii/hasura-service:${{ steps.version.outputs.tag }}
