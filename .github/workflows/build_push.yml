@@ -32,6 +32,11 @@ jobs:
           push: true
           tags: shafibhaii/app-service:${{ steps.version.outputs.tag }}
 
+      - name: Check if db service image exists
+        id: check-db-image
+        run: docker inspect db-service:${{ steps.version.outputs.tag }}
+        continue-on-error: true
+
       - name: Build and push db service image
         run: docker-compose -f docker-compose.yml build db
         env:
@@ -39,8 +44,17 @@ jobs:
 
       - name: Push db service image
         run: |
-          docker tag db-service:${{ steps.version.outputs.tag }} shafibhaii/db-service:${{ steps.version.outputs.tag }}
-          docker push shafibhaii/db-service:${{ steps.version.outputs.tag }}
+          if [[ ${{ steps.check-db-image.outcome }} == 'success' ]]; then
+            docker tag db-service:${{ steps.version.outputs.tag }} shafibhaii/db-service:${{ steps.version.outputs.tag }}
+            docker push shafibhaii/db-service:${{ steps.version.outputs.tag }}
+          else
+            echo "db-service image does not exist. Skipping push."
+          fi
+
+      - name: Check if hasura service image exists
+        id: check-hasura-image
+        run: docker inspect hasura-service:${{ steps.version.outputs.tag }}
+        continue-on-error: true
 
       - name: Build and push hasura service image
         run: docker-compose -f docker-compose.yml build hasura
@@ -49,5 +63,9 @@ jobs:
 
       - name: Push hasura service image
         run: |
-          docker tag hasura-service:${{ steps.version.outputs.tag }} shafibhaii/hasura-service:${{ steps.version.outputs.tag }}
-          docker push shafibhaii/hasura-service:${{ steps.version.outputs.tag }}
+          if [[ ${{ steps.check-hasura-image.outcome }} == 'success' ]]; then
+            docker tag hasura-service:${{ steps.version.outputs.tag }} shafibhaii/hasura-service:${{ steps.version.outputs.tag }}
+            docker push shafibhaii/hasura-service:${{ steps.version.outputs.tag }}
+          else
+            echo "hasura-service image does not exist. Skipping push."
+          fi
