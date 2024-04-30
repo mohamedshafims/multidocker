@@ -1,4 +1,4 @@
-name: Docker Build and Push for DB and Hasura
+name: Deploy
 
 on:
   push:
@@ -6,42 +6,33 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Login to Docker registry
+      - name: Set up Docker Compose
+        run: |
+          sudo rm /usr/local/bin/docker-compose
+          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+
+      - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build and push PostgreSQL image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-          tags: shafibhaii/db-service:latest
-          build-args: |
-            POSTGRES_USER=postgres
-            POSTGRES_PASSWORD=example
-            POSTGRES_DB=hello_db
-          file: ./docker-compose-image.yml
-          services: db
+      - name: Build and push db service
+        run: |
+          docker-compose build db
+          docker tag <your-docker-compose-project>_db:latest shafibhaii/db-service:latest
+          docker push shafibhaii/db-service:latest
 
-      - name: Build and push Hasura image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-          tags: shafibhaii/hasura-service:latest
-          build-args: |
-            HASURA_GRAPHQL_DATABASE_URL=postgres://postgres:example@db:5432/hello_db
-            HASURA_GRAPHQL_ENABLE_CONSOLE=true
-            HASURA_GRAPHQL_ADMIN_SECRET=myadminsecret
-            HASURA_GRAPHQL_ENABLE_TELEMETRY=false
-          file: ./docker-compose-image.yml
-          services: hasura
+      - name: Build and push hasura service
+        run: |
+          docker-compose build hasura
+          docker tag <your-docker-compose-project>_hasura:latest shafibhaii/hasura-service:latest
+          docker push shafibhaii/hasura-service:latest
