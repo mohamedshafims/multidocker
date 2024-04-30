@@ -1,4 +1,4 @@
-name: Docker Build and Push
+name: Docker Build and Push for DB and Hasura
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=example
             POSTGRES_DB=hello_db
-          file: ./docker-compose.yml
+          file: ./docker-compose-image.yml
           services: db
 
       - name: Build and push Hasura image
@@ -43,5 +43,5 @@ jobs:
             HASURA_GRAPHQL_ENABLE_CONSOLE=true
             HASURA_GRAPHQL_ADMIN_SECRET=myadminsecret
             HASURA_GRAPHQL_ENABLE_TELEMETRY=false
-          file: ./docker-compose.yml
+          file: ./docker-compose-image.yml
           services: hasura
