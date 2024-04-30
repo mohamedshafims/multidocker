@@ -15,10 +15,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Login to Docker registry
+      - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
-          registry: <your-docker-registry>
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
@@ -32,7 +31,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: app-service:${{ steps.version.outputs.tag }}
+          tags: your-username/app-service:${{ steps.version.outputs.tag }}
 
       - name: Build and push db service image
         uses: docker/build-push-action@v2
@@ -40,7 +39,7 @@ jobs:
           context: .
           file: ./docker-compose.yml
           push: true
-          tags: db-service:${{ steps.version.outputs.tag }}
+          tags: your-username/db-service:${{ steps.version.outputs.tag }}
           target: db
 
       - name: Build and push hasura service image
@@ -49,5 +48,5 @@ jobs:
           context: .
           file: ./docker-compose.yml
           push: true
-          tags: hasura-service:${{ steps.version.outputs.tag }}
+          tags: your-username/hasura-service:${{ steps.version.outputs.tag }}
           target: hasura
